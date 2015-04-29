@@ -1305,6 +1305,41 @@ public class ZMQ {
                 setBytesSockopt(PLAIN_PASSWORD, password);
             }
         }
+
+        /**
+         * Sets if the socket is for a server using the CURVE security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:26">CURVE RFC</a>
+         * @param curve whether or not to use CURVE security
+         * @since 4.0.0
+         */
+        public void setCurveServer(boolean curve) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(CURVE_SERVER, curve ? 1L : 0L);
+            }
+        }
+
+        /**
+         * Sets the accepted server public key on a client socket.
+         * @see <a href="http://rfc.zeromq.org/spec:26">CURVE RFC</a>
+         * @param serverkey the public key of the server as byte array (length 32)
+         */
+        public void setCurveServerkey(byte[] serverkey) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(CURVE_SERVERKEY, serverkey);
+            }
+        }
+        
+        /**
+         * Applies the given key pair to the client or server socket.
+         * @see <a href="http://rfc.zeromq.org/spec:26">CURVE RFC</a>
+         * @param keypair to use to authenticate the socket and negotiate session keys.
+         */
+        public void keyApply(KeyPair keypair) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(CURVE_PUBLICKEY, keypair.publicKey());
+                setBytesSockopt(CURVE_SECRETKEY, keypair.privateKey());
+            }
+        }
         
         /**
          * Sets the domain for ZAP (ZMQ RFC 27) authentication.
@@ -1812,6 +1847,12 @@ public class ZMQ {
         private static final int PLAIN_SERVER = 44;
         private static final int PLAIN_USERNAME = 45;
         private static final int PLAIN_PASSWORD = 46;
+
+	private static final int CURVE_SERVER = 47;
+	private static final int CURVE_PUBLICKEY = 48;
+	private static final int CURVE_SECRETKEY = 49;
+	private static final int CURVE_SERVERKEY = 50;
+
         private static final int PROBE_ROUTER = 51;
         private static final int REQ_CORRELATE = 52;
         private static final int REQ_RELAXED = 53;
@@ -1821,11 +1862,39 @@ public class ZMQ {
         private static final int GSSAPI_PRINCIPAL = 63;
         private static final int GSSAPI_SERVICE_PRINCIPAL = 64;
         private static final int GSSAPI_PLAINTEXT = 65;
+
+    }
+
+    public static class KeyPair {
+	static {
+	    if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+		System.loadLibrary("jzmq");
+	}
+
+	private final byte[] publickey = new byte[32];
+	private final byte[] privatekey = new byte[32];
+
+	protected native void construct();
+
+	public KeyPair() {
+	    construct();
+	}
+
+	public byte[] privateKey() {
+	    return privatekey;
+	}
+
+	public byte[] publicKey() {
+	    return publickey;
+	}
+
     }
 
     public static class PollItem {
         private Socket socket;
         private SelectableChannel channel;
+        @SuppressWarnings("unused")
+        // native field access
         private int events;
         private int revents;
 
@@ -1974,8 +2043,6 @@ public class ZMQ {
 
                     // Create new internal arrays.
                     PollItem[] ns = new PollItem[nsize];
-                    short[] ne = new short[nsize];
-                    short[] nr = new short[nsize];
 
                     // Copy contents of current arrays into new arrays.
                     for (int i = 0; i < this.next; ++i) {

@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  */
@@ -60,7 +60,7 @@ public class ZDispatcherTest {
         assertEquals(0, latch.getCount());
 
         dispatcher.shutdown();
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ZDispatcherTest {
         assertFalse(threadingIssueDetected.get());
 
         dispatcher.shutdown();
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -191,7 +191,7 @@ public class ZDispatcherTest {
         assertFalse(shutdownIssueDetected.get());
 
         dispatcher.shutdown();
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -226,6 +226,6 @@ public class ZDispatcherTest {
         System.out.println(MessageFormat.format("performanceTest throughput:{0} messages/seconds", nMessages / ((System.currentTimeMillis() - start) / 1000)));
 
         dispatcher.shutdown();
-        ctx.destroy();
+        ctx.close();
     }
 }

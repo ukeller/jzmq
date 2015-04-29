@@ -1,8 +1,10 @@
 package org.zeromq;
 
-import org.zeromq.ZMQ.Socket;
+import java.nio.charset.Charset;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.zeromq.ZMQ.Socket;
 
 public class ZThreadTest {
 
@@ -17,7 +19,7 @@ public class ZThreadTest {
 
                 Socket push = ctx.createSocket(ZMQ.PUSH);
                 assert (push != null);
-                ctx.destroy();
+                ctx.close();
             }
         };
 
@@ -34,7 +36,7 @@ public class ZThreadTest {
             public void run(Object[] args, ZContext ctx, Socket pipe) {
                 // Create a socket to check it'll be automatically deleted
                 ctx.createSocket(ZMQ.PUSH);
-                pipe.recvStr();
+                pipe.recvStr(Charset.defaultCharset());
                 pipe.send("pong");
             }
         };
@@ -43,7 +45,7 @@ public class ZThreadTest {
         assert (pipe != null);
 
         pipe.send("ping");
-        String pong = pipe.recvStr();
+        String pong = pipe.recvStr(Charset.defaultCharset());
 
         Assert.assertEquals(pong, "pong");
 

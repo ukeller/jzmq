@@ -24,6 +24,7 @@ JZMQ_CPP_FILES = \
 	ZMQ.cpp \
 	Context.cpp \
 	Socket.cpp \
+	KeyPair.cpp \
 	Poller.cpp \
 	Event.cpp \
 	util.cpp
@@ -35,7 +36,8 @@ JZMQ_H_FILES = \
 	org_zeromq_ZMQ_Event.h \
 	org_zeromq_ZMQ_PollItem.h \
 	org_zeromq_ZMQ_Poller.h \
-	org_zeromq_ZMQ_Socket.h
+	org_zeromq_ZMQ_Socket.h \
+	org_zeromq_ZMQ_KeyPair.h
 
 JZMQ_HPP_FILES = \
 	util.hpp
@@ -95,6 +97,10 @@ $(srcdir)/Context.cpp: \
 
 $(srcdir)/Socket.cpp: \
 	org_zeromq_ZMQ_Socket.h \
+	$(JZMQ_HPP_FILES)
+
+$(srcdir)/KeyPair.cpp: \
+	org_zeromq_ZMQ_KeyPair.h \
 	$(JZMQ_HPP_FILES)
 
 $(srcdir)/Poller.cpp: \

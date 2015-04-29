@@ -3,6 +3,8 @@ package org.zeromq;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -227,9 +229,9 @@ public class ZMQTest {
         public void run() {
             s.connect("tcp://127.0.0.1:6660");
             s.send("hello", 0);
-            String msg = s.recvStr(0);
+            s.recvStr(0, Charset.defaultCharset());
             s.send("world", 0);
-            msg = s.recvStr(0);
+            s.recvStr(0, Charset.defaultCharset());
 
             s.close();
         }
@@ -253,17 +255,17 @@ public class ZMQTest {
             s.connect("tcp://127.0.0.1:6661");
             int count = 0;
             while (count < 2) {
-                String msg = s.recvStr(0);
+                String msg = s.recvStr(0, Charset.defaultCharset());
                 if (msg == null) {
                     throw new RuntimeException();
                 }
                 String identity = msg;
-                msg = s.recvStr(0);
+                msg = s.recvStr(0, Charset.defaultCharset());
                 if (msg == null) {
                     throw new RuntimeException();
                 }
 
-                msg = s.recvStr(0);
+                msg = s.recvStr(0, Charset.defaultCharset());
                 if (msg == null) {
                     throw new RuntimeException();
                 }
@@ -374,9 +376,9 @@ public class ZMQTest {
             socket.connect("tcp://localhost:12345");
             socket.send("test1", ZMQ.SNDMORE);
             socket.send("test2");
-            assertEquals("test1", reply.recvStr());
+            assertEquals("test1", reply.recvStr(Charset.defaultCharset()));
             assertTrue(reply.hasReceiveMore());
-            assertEquals("test2", reply.recvStr());
+            assertEquals("test2", reply.recvStr(Charset.defaultCharset()));
         } finally {
             try {
                 socket.close();
