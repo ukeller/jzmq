@@ -143,7 +143,7 @@ public class ZAuth {
                 blacklist.put(address, "OK");
             } else if (command.equals("PLAIN")) {
                 // For now we don't do anything with domains
-                String domain = msg.popString();
+                /*String domain = */msg.popString();
                 // Get password file and load into HashMap
                 // If the file doesn't exist we'll get an empty map
                 String filename = msg.popString();
@@ -156,7 +156,7 @@ public class ZAuth {
                 reply.destroy();
             } else if (command.equals("GSSAPI")) {
                 //for now, we don't do anything with domains
-                String domain = msg.popString();
+                /*String domain = */msg.popString();
             } else if (command.equals("VERBOSE")) {
                 String verboseStr = msg.popString();
                 this.verbose = verboseStr.equals("true");
@@ -340,7 +340,7 @@ public class ZAuth {
     public ZAuth(ZContext ctx) {
         pipe = ZThread.fork(ctx, new ZAuthAgent(this));
         ZMsg msg = ZMsg.recvMsg(pipe);
-        String response = msg.popString();
+        /*String response =*/ msg.popString();
 
         msg.destroy();
     }

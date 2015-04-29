@@ -55,7 +55,7 @@ public class ZFrameTest {
             f.send(output, ZMQ.SNDMORE);
         }
         assertEquals(5, f.size());
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -72,7 +72,7 @@ public class ZFrameTest {
         f.destroy();
         assertFalse(copy.equals(f));
         assertEquals(5, copy.size());
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -109,7 +109,7 @@ public class ZFrameTest {
         f = ZFrame.recvFrame(input, ZMQ.DONTWAIT);
         assertTrue(!f.hasData());
 
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -131,6 +131,6 @@ public class ZFrameTest {
         assertEquals(f2.toString(), "Hello");
         assertTrue(f2.equals(f1));
 
-        ctx.destroy();
+        ctx.close();
     }
 }

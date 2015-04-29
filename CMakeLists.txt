@@ -111,6 +111,7 @@ set(cxx-sources
 	Context.cpp
 	Poller.cpp
 	Socket.cpp
+	Keypair.cpp
 	util.cpp
 	ZMQ.cpp
 )

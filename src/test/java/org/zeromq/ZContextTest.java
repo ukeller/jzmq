@@ -21,12 +21,13 @@ public class ZContextTest {
         assertEquals(1, ctx.getIoThreads());
         assertEquals(0, ctx.getLinger());
         assertTrue(ctx.isMain());
+        ctx.close();
     }
 
     @Test
     public void testDestruction() {
         ZContext ctx = new ZContext();
-        ctx.destroy();
+        ctx.close();
         assertTrue(ctx.getSockets().isEmpty());
 
         // Ensure context is not destroyed if not in main thread
@@ -34,7 +35,7 @@ public class ZContextTest {
         ctx1.setMain(false);
         @SuppressWarnings("unused")
         Socket s = ctx1.createSocket(ZMQ.PAIR);
-        ctx1.destroy();
+        ctx1.close();
         assertTrue(ctx1.getSockets().isEmpty());
         assertTrue(ctx1.getContext() != null);
     }
@@ -51,7 +52,7 @@ public class ZContextTest {
             assertTrue(s1 != null);
             assertEquals(2, ctx.getSockets().size());
         } finally {
-            ctx.destroy();
+            ctx.close();
         }
     }
 
@@ -66,7 +67,7 @@ public class ZContextTest {
             ctx.destroySocket(s);
             assertEquals(0, ctx.getSockets().size());
         } finally {
-            ctx.destroy();
+            ctx.close();
         }
     }
 
@@ -85,8 +86,8 @@ public class ZContextTest {
         assertEquals(1, shadowCtx.getSockets().size());
         assertEquals(1, ctx.getSockets().size());
 
-        shadowCtx.destroy();
-        ctx.destroy();
+        shadowCtx.close();
+        ctx.close();
     }
 
 }
