@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Event;
+import org.zeromq.ZMQ.KeyPair;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 
@@ -40,7 +41,19 @@ public class ZMQTest {
         assertEquals(ZMQ.getMajorVersion() + "." + ZMQ.getMinorVersion() + "." + ZMQ.getPatchVersion(),
                 ZMQ.getVersionString());
     }
-
+    
+    /**
+     * Test for {@link org.zeromq.ZMQ.Keypair}.
+     */
+    @Test
+    public void testKeypair() {
+        KeyPair pair = new ZMQ.KeyPair();
+        assertNotNull(pair);
+        assertNotNull(pair.privateKey());
+        assertNotNull(pair.publicKey());
+        assertEquals(32, pair.privateKey().length);
+        assertEquals(32, pair.publicKey().length);
+    }
     /**
      * Test method for {@link org.zeromq.ZMQ.Socket#bindToRandomPort(String)}.
      */

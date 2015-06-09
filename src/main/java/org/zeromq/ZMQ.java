@@ -1871,13 +1871,23 @@ public class ZMQ {
 		System.loadLibrary("jzmq");
 	}
 
-	private final byte[] publickey = new byte[32];
-	private final byte[] privatekey = new byte[32];
-
+	private final byte[] publickey;
+	private final byte[] privatekey;
+	
 	protected native void construct();
 
 	public KeyPair() {
+	    this.publickey = new byte[32];
+	    this.privatekey = new byte[32];
 	    construct();
+	}
+
+	public KeyPair(byte[] publickey, byte[] privatekey) {
+	    if (publickey.length != 32 || privatekey.length != 32) {
+	        throw new IllegalArgumentException("keys must be of length 32");
+	    }
+	    this.publickey = publickey;
+	    this.privatekey = privatekey;
 	}
 
 	public byte[] privateKey() {
