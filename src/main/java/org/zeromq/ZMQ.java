@@ -1875,11 +1875,27 @@ public class ZMQ {
 	private final byte[] privatekey;
 	
 	protected native void construct();
+	protected native void construct_from_base85(String pubkey, String seckey);
 
 	public KeyPair() {
 	    this.publickey = new byte[32];
 	    this.privatekey = new byte[32];
 	    construct();
+	}
+
+	/**
+	 * Construct from base 85
+	 * @param publickey
+	 * @param privatekey
+	 */
+	public KeyPair(String pubkey, String seckey) {
+	    if (pubkey == null || pubkey.length() != 40 ||
+	        seckey == null || seckey.length() != 40) {
+	        throw new IllegalArgumentException("keys must be of length 40");
+	    }
+	    this.publickey = new byte[32];
+	    this.privatekey = new byte[32];
+	    construct_from_base85(pubkey, seckey);
 	}
 
 	public KeyPair(byte[] publickey, byte[] privatekey) {
@@ -1889,6 +1905,7 @@ public class ZMQ {
 	    this.publickey = publickey;
 	    this.privatekey = privatekey;
 	}
+
 
 	public byte[] privateKey() {
 	    return privatekey;

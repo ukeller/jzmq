@@ -54,6 +54,18 @@ public class ZMQTest {
         assertEquals(32, pair.privateKey().length);
         assertEquals(32, pair.publicKey().length);
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testKeypairFromStringInvalid() {
+        new ZMQ.KeyPair("", "");
+    }
+
+    @Test
+    public void testKeypairFromString() {
+        new ZMQ.KeyPair("YaN3e<Ebw$w.hwRMD@4j6nn!j!o?D&r:FxN6lSIZ",
+                        "ldD!V[I4Kdq2eeZSRx[rQ9#Q4]%Is[Whzr3ao!5G");
+    }
+
     /**
      * Test method for {@link org.zeromq.ZMQ.Socket#bindToRandomPort(String)}.
      */

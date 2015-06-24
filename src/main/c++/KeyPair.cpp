@@ -31,17 +31,35 @@ static jfieldID privatekeyptrFID;
 
 static void ensure_keypair(JNIEnv *env, jobject obj);
 
-static void decode_key(JNIEnv *env, jobject obj, jfieldID field, char * key) {
+static void decode_key(JNIEnv *env, jobject obj, jfieldID field, const char * key) {
+
   jobject fieldobj = env->GetObjectField (obj, field);
   jbyteArray * fieldarr = reinterpret_cast<jbyteArray*>(&fieldobj);
   jbyte* key_bytes = env->GetByteArrayElements(*fieldarr, NULL);
-  uint8_t* r = zmq_z85_decode(reinterpret_cast<uint8_t*>(key_bytes), key);
+  uint8_t* r = zmq_z85_decode(reinterpret_cast<uint8_t*>(key_bytes), (char*)key);
   env->ReleaseByteArrayElements(*fieldarr, key_bytes, 0);
   if (!r) {
     int err = zmq_errno();
     raise_exception(env, err);
   }
 }
+
+
+/**
+ * Called to construct a Java Context object.
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024KeyPair_construct_1from_1base85
+(JNIEnv *env, jobject obj, jstring pubkey, jstring seckey) {
+
+  ensure_keypair(env,obj);
+  const char *pubkey_ = env->GetStringUTFChars(pubkey, JNI_FALSE);
+  const char *seckey_ = env->GetStringUTFChars(seckey, JNI_FALSE);
+  decode_key(env, obj, publickeyptrFID, pubkey_);
+  decode_key(env, obj, privatekeyptrFID, seckey_);
+  env->ReleaseStringUTFChars(pubkey, pubkey_);
+  env->ReleaseStringUTFChars(seckey, seckey_);
+}
+
 
 /**
  * Called to construct a Java Context object.
