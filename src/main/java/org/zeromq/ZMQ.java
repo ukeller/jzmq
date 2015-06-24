@@ -1885,8 +1885,8 @@ public class ZMQ {
 
 	/**
 	 * Construct from base 85
-	 * @param publickey
-	 * @param privatekey
+	 * @param pubkey public key as base85 string.
+	 * @param seckey private key as bas85 string.
 	 */
 	public KeyPair(String pubkey, String seckey) {
 	    if (pubkey == null || pubkey.length() != 40 ||
