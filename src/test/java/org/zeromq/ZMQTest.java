@@ -53,6 +53,12 @@ public class ZMQTest {
         assertNotNull(pair.publicKey());
         assertEquals(32, pair.privateKey().length);
         assertEquals(32, pair.publicKey().length);
+
+        assertEquals(40, pair.privateKeyString().length());
+        assertEquals(40, pair.publicKeyString().length());
+
+        KeyPair npair = new ZMQ.KeyPair(pair.publicKeyString(), pair.privateKeyString());
+        assertEquals(pair,npair);
     }
 
     @Test(expected=IllegalArgumentException.class)

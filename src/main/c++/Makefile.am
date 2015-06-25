@@ -27,6 +27,7 @@ JZMQ_CPP_FILES = \
 	KeyPair.cpp \
 	Poller.cpp \
 	Event.cpp \
+	Utils.cpp \
 	util.cpp
 
 JZMQ_H_FILES = \
@@ -84,7 +85,7 @@ clean-local:
 
 $(JZMQ_H_FILES): $(javah_stamp)
 $(javah_stamp): $(javac_stamp)
-	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ org.zeromq.Utils
 	@touch $@
 
 $(srcdir)/ZMQ.cpp: \

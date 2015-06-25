@@ -112,6 +112,7 @@ set(cxx-sources
 	Poller.cpp
 	Socket.cpp
 	Keypair.cpp
+	Utils.cpp
 	util.cpp
 	ZMQ.cpp
 )
@@ -164,7 +165,7 @@ add_custom_command(
 	COMMAND ${JNI_JAVAH}
 	ARGS	-jni
 		-classpath ${CMAKE_CURRENT_BINARY_DIR}
-		org.zeromq.ZMQ
+		org.zeromq.ZMQ org.zeromq.Utils
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	DEPENDS ${java-classes}
 )

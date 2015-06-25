@@ -26,72 +26,25 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_KeyPair.h"
 
-static jfieldID publickeyptrFID;
-static jfieldID privatekeyptrFID;
-
-static void ensure_keypair(JNIEnv *env, jobject obj);
-
-static void decode_key(JNIEnv *env, jobject obj, jfieldID field, const char * key) {
-
-  jobject fieldobj = env->GetObjectField (obj, field);
-  jbyteArray * fieldarr = reinterpret_cast<jbyteArray*>(&fieldobj);
-  jbyte* key_bytes = env->GetByteArrayElements(*fieldarr, NULL);
-  uint8_t* r = zmq_z85_decode(reinterpret_cast<uint8_t*>(key_bytes), (char*)key);
-  env->ReleaseByteArrayElements(*fieldarr, key_bytes, 0);
-  if (!r) {
-    int err = zmq_errno();
-    raise_exception(env, err);
-  }
-}
-
-
 /**
  * Called to construct a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024KeyPair_construct_1from_1base85
-(JNIEnv *env, jobject obj, jstring pubkey, jstring seckey) {
-
-  ensure_keypair(env,obj);
-  const char *pubkey_ = env->GetStringUTFChars(pubkey, JNI_FALSE);
-  const char *seckey_ = env->GetStringUTFChars(seckey, JNI_FALSE);
-  decode_key(env, obj, publickeyptrFID, pubkey_);
-  decode_key(env, obj, privatekeyptrFID, seckey_);
-  env->ReleaseStringUTFChars(pubkey, pubkey_);
-  env->ReleaseStringUTFChars(seckey, seckey_);
-}
-
-
-/**
- * Called to construct a Java Context object.
- */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024KeyPair_construct(JNIEnv *env, jobject obj) {
-
-  ensure_keypair(env,obj);
+JNIEXPORT jobjectArray JNICALL
+Java_org_zeromq_ZMQ_00024KeyPair_construct(JNIEnv *env, jobject obj) {
   char public_key[41];
   char secret_key[41];
-  int rc =  zmq_curve_keypair (public_key, secret_key);
+  int rc = zmq_curve_keypair(public_key, secret_key);
 
   if (rc) {
     int err = zmq_errno();
     raise_exception(env, err);
-    return;
+    return NULL;
   }
-  decode_key(env, obj, publickeyptrFID, public_key);
-  decode_key(env, obj, privatekeyptrFID, secret_key);
-}
 
+  jobjectArray ret = (jobjectArray)env->NewObjectArray(
+      2, env->FindClass("java/lang/String"), NULL);
 
-/**
- * Make sure we have a valid pointers to Java's KeyPair::publickey and KeyPair::privatekey
- */
-static void ensure_keypair(JNIEnv *env, jobject obj) {
-  if (publickeyptrFID == NULL || privatekeyptrFID == NULL) {
-    jclass cls = env->GetObjectClass(obj);
-    assert(cls);
-    publickeyptrFID = env->GetFieldID(cls, "publickey", "[B");
-    assert(publickeyptrFID);
-    privatekeyptrFID = env->GetFieldID(cls, "privatekey", "[B");
-    assert(privatekeyptrFID);
-    env->DeleteLocalRef(cls);
-  }
+  env->SetObjectArrayElement(ret, 0, env->NewStringUTF(public_key));
+  env->SetObjectArrayElement(ret, 1, env->NewStringUTF(secret_key));
+  return ret;
 }

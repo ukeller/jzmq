@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.channels.SelectableChannel;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1874,12 +1875,12 @@ public class ZMQ {
 	private final byte[] publickey;
 	private final byte[] privatekey;
 	
-	protected native void construct();
-	protected native void construct_from_base85(String pubkey, String seckey);
+	protected native String[] construct();
 
 	public KeyPair() {
-	    this.publickey = new byte[32];
-	    this.privatekey = new byte[32];
+	    String[] keys = construct();
+	    this.publickey = Utils.z85_decode(keys[0]);
+	    this.privatekey = Utils.z85_decode(keys[1]);
 	    construct();
 	}
 
@@ -1893,9 +1894,8 @@ public class ZMQ {
 	        seckey == null || seckey.length() != 40) {
 	        throw new IllegalArgumentException("keys must be of length 40");
 	    }
-	    this.publickey = new byte[32];
-	    this.privatekey = new byte[32];
-	    construct_from_base85(pubkey, seckey);
+	    this.publickey = Utils.z85_decode(pubkey);
+	    this.privatekey = Utils.z85_decode(seckey);
 	}
 
 	public KeyPair(byte[] publickey, byte[] privatekey) {
@@ -1906,6 +1906,13 @@ public class ZMQ {
 	    this.privatekey = privatekey;
 	}
 
+	public String privateKeyString() {
+	    return Utils.z85_encode(privatekey);
+	}
+
+        public String publicKeyString() {
+            return Utils.z85_encode(publickey);
+        }
 
 	public byte[] privateKey() {
 	    return privatekey;
@@ -1915,6 +1922,23 @@ public class ZMQ {
 	    return publickey;
 	}
 
+	@Override
+	public int hashCode() {
+	    return publickey[11];
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+	    if (this==obj) {
+	        return true;
+	    }
+	    if (!(obj instanceof KeyPair)) {
+	        return false;
+	    }
+	    KeyPair that = (KeyPair)obj;
+	    return Arrays.equals(this.publickey, that.publickey) &&
+	           Arrays.equals(this.privatekey, that.privatekey);
+	}
     }
 
     public static class PollItem {
